@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Student>
+
+@{
+    ViewBag.Title = "学生列表";
+}
+
+
+<div class="card-deck">
+        @foreach (var student in Model)
+        {
+            <div class="card m-3">
+                <div class="card-header">
+                    <h3 class="card-title">@student.Name</h3>
+                </div>
+
+                <img class="card-img-top" src="~/Images/00_系统首页.jpg"  asp-append-version="true" />
+
+                <div class="card-body text-center">
+                    <h3 class="card-title">主修科目：@student.MaJob</h3>
+                </div>
+
+                <div class="card-footer text-center">
+                    <a asp-controller="home" asp-action="details" asp-route-id="@student.Id" class="btn btn-primary">查看</a>
+                    <a asp-controller="home" asp-action="Detele" asp-route-id="@student.Id" class="btn btn-primary">编辑</a>
+                    <a asp-controller="home" asp-action="Detele" asp-route-id="@student.Id" class="btn btn-primary">删除</a>
+
+                </div>
+
+            </div>
+        }
+    </div>
