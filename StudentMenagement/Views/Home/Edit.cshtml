@@ -1,0 +1,100 @@
+﻿@model StudentEditViewModel
+@{
+    ViewBag.Title = "编辑学生信息";
+
+    var photoPath = "~/Images/avatars/weixin.jpg";
+
+    if (Model.ExistingPhotoPath != null)
+    {
+        photoPath = "~/Images/avatars/" + Model.ExistingPhotoPath;
+    }
+}
+
+<form enctype="multipart/form-data" asp-controller="home" asp-action="edit" method="post" class="mt-3">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    @*提交表单需要的两个属性*@
+
+    <input hidden asp-for="Id" />
+    <input hidden asp-for="ExistingPhotoPath" />
+
+
+
+    <div class="form-group row">
+        <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Name" class="form-control" placeholder="请输入名字" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="Email" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Email" class="form-control" placeholder="请注入邮箱地址" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="MaJor" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <select asp-for="MaJor"
+                    class="form-select mr-sm-2"
+                    asp-items="Html.GetEnumSelectList<MaEnum>()">
+                <option value="">请选择</option>
+            </select>
+            <span asp-validation-for="MaJor" class="text-danger"></span>
+
+        </div>
+    </div>
+
+    @* 我们使用了asp-for的taghelper设置input的属性为"Photos"。
+        "Photos"属性类型是list<IFormFile>，这样就支持多文件上传了
+        ， 所以在运行的时候ASP.NET Core会将该标签生成上传控件(input type=file) *@
+    <div class="form-group row">
+        <label asp-for="Photos" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <div class="custom-file">
+                <input asp-for="Photos" multiple class="form-control custom-file-input">
+                <label class="custom-file-label">单击修改图片</label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group row col-4 offset-4">
+        <img class="imageThumbnail" src="@photoPath" asp-append-version="true" />
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">更新</button>
+            <a  asp-controller="home" asp-action="index" class="btn btn-primary">取消</a>
+        </div>
+    </div>
+
+
+    @*以下JavaScript代码是必须的，它的作用是 -
+        如果选择了单个文件，则显示该文件的名称。 -
+        如果多个选择文件，然后显示文件数量。 *@
+    @section Scripts{
+        <script>
+            $(document).ready(function () {
+                $(".custom-file-input").on("change", function () {
+                    debugger;
+                    console.log($(this)); //可以取消这里打印看看this中的值。
+                    var fileLabel = $(this).next(".custom-file-label");
+                    var files = $(this)[0].files;
+                    if (files.length > 1) {
+                        fileLabel.html("您已经选择了：" + files.length + " 个文件");
+                    } else if (files.length == 1) {
+                        fileLabel.html(files[0].name);
+                    }
+                });
+            });
+
+
+        </script>
+    }
+</form>

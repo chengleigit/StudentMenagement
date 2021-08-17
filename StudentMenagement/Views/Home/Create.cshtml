@@ -1,9 +1,9 @@
-﻿@model Student
+﻿@model StudentCreateViewModel
 @inject IStudentRepository _studentRepository
 @{ViewBag.Title = "创建学生信息"; }
 
 
-<form asp-controller="home" asp-action="create" method="post" class="mt-3">
+<form enctype="multipart/form-data" asp-controller="home" asp-action="create" method="post" class="mt-3">
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="form-group row">
@@ -23,15 +23,28 @@
     </div>
 
     <div class="form-group row">
-        <label asp-for="MaJob" class="col-sm-2 col-form-label"></label>
+        <label asp-for="MaJor" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <select asp-for="MaJob"
+            <select asp-for="MaJor"
                     class="form-select mr-sm-2"
                     asp-items="Html.GetEnumSelectList<MaEnum>()">
                 <option value="">请选择</option>
             </select>
-            <span asp-validation-for="MaJob" class="text-danger"></span>
+            <span asp-validation-for="MaJor" class="text-danger"></span>
 
+        </div>
+    </div>
+
+    @* 我们使用了asp-for的taghelper设置input的属性为"Photos"。
+        "Photos"属性类型是list<IFormFile>，这样就支持多文件上传了
+        ， 所以在运行的时候ASP.NET Core会将该标签生成上传控件(input type=file) *@
+    <div class="form-group row">
+        <label asp-for="Photos" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <div class="custom-file">
+                <input asp-for="Photos" multiple class="form-control custom-file-input">
+                <label class="custom-file-label">请选择照片....</label>
+            </div>
         </div>
     </div>
 
@@ -46,4 +59,28 @@
             学生总人数 = @_studentRepository.GetAllStudents().Count().ToString()
         </div>
     </div>
+
+
+    @*以下JavaScript代码是必须的，它的作用是 -
+        如果选择了单个文件，则显示该文件的名称。 -
+        如果多个选择文件，然后显示文件数量。 *@
+    @section Scripts{
+        <script>
+            $(document).ready(function () {
+                $(".custom-file-input").on("change", function () {
+                    debugger;
+                    console.log($(this)); //可以取消这里打印看看this中的值。
+                    var fileLabel = $(this).next(".custom-file-label");
+                    var files = $(this)[0].files;
+                    if (files.length > 1) {
+                        fileLabel.html("您已经选择了：" + files.length + " 个文件");
+                    } else if (files.length == 1) {
+                        fileLabel.html(files[0].name);
+                    }
+                });
+            });
+
+            
+        </script>
+    }
 </form>

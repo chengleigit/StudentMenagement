@@ -2,6 +2,7 @@
 @model HomeDetailsViewModel;
 @{
     ViewBag.Title = "学生详情";
+    var photoPath = "~/Images/avatars/" + (Model.Student.PhotoPath ?? "weixin.jpg");
 }
 <h3>@ViewBag.PageTitle</h3>
 
@@ -13,10 +14,10 @@
             </div>
 
             <div class="card-body text-center">
-                <img class="card-img-top" src="~/Images/00_系统首页.jpg" />
+                <img class="card-img-top" src=@photoPath asp-append-version="true">
                 <h4>学生ID：@Model.Student.Id</h4>
                 <h4>邮箱：@Model.Student.Email</h4>
-                <h4>科目：@Model.Student.MaJob</h4>
+                <h4>科目：@Model.Student.MaJor.GetDisplayName()</h4>
             </div>
 
             <div class="card-footer text-center">

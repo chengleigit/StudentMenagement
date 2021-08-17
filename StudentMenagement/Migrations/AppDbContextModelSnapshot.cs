@@ -29,7 +29,7 @@ namespace StudentMenagement.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaJob")
+                    b.Property<int>("MaJor")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -48,21 +48,21 @@ namespace StudentMenagement.Migrations
                         {
                             Id = 1,
                             Email = "@ww.com",
-                            MaJob = 1,
+                            MaJor = 1,
                             Name = "张三"
                         },
                         new
                         {
                             Id = 2,
                             Email = "@lisi.com",
-                            MaJob = 1,
+                            MaJor = 1,
                             Name = "历史"
                         },
                         new
                         {
                             Id = 3,
                             Email = "@zhaoliu.com",
-                            MaJob = 1,
+                            MaJor = 1,
                             Name = "赵六"
                         });
                 });

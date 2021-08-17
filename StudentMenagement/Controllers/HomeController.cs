@@ -1,17 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Models;
 using StudentMenagement.ViewModels;
+using System;
+using System.IO;
 
 namespace StudentMenagement.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IStudentRepository _studnetRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public HomeController(IStudentRepository studnetRepository)
+
+        public HomeController(IStudentRepository studnetRepository,IWebHostEnvironment webHostEnvironment)
         {
             _studnetRepository = studnetRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public ActionResult Index()
@@ -27,22 +34,107 @@ namespace StudentMenagement.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Student student)
+        public IActionResult Create(StudentCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
-                Student student_new = _studnetRepository.Insert(student);
-                //return RedirectToAction("Details", new { id = student_new.Id });
+                string uniqueFileName = null;
+
+                //单个图片上传
+                //if (model.Photos!=null)
+                //{
+                //    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images");
+                //    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Photos.FileName;
+                //    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                //    model.Photos.CopyTo(new FileStream(filePath, FileMode.Create));
+                //}
+
+                foreach (IFormFile photo in model.Photos)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images","avatars");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    photo.CopyTo(new FileStream(filePath, FileMode.Create));
+                }
+
+                Student newStuent = new Student()
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    MaJor = model.MaJor,
+                    PhotoPath = uniqueFileName
+                };
+                _studnetRepository.Insert(newStuent);
+
+                return RedirectToAction("Details", new { id=newStuent.Id });
+
             }
             return View();
         }
 
-        public ViewResult Details(int? Id)
+        [HttpGet]
+        public ViewResult Edit(int Id) 
         {
-            Student model = _studnetRepository.GetStudent(Id ?? 1);
+            Student stu = _studnetRepository.GetStudent(Id);
+
+            StudentEditViewModel studentEditViewModel = new StudentEditViewModel()
+            {
+                Id = stu.Id,
+                Name = stu.Name,
+                Email = stu.Email,
+                MaJor = stu.MaJor,
+                ExistingPhotoPath = stu.PhotoPath
+            };
+
+            return View(studentEditViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(StudentEditViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Student stu = _studnetRepository.GetStudent(model.Id);
+
+                stu.Name = model.Name;
+                stu.Email = model.Email;
+                stu.MaJor = model.MaJor;
+
+                //如果修改图片
+                if (model.Photos!=null&& model.Photos.Count>0)
+                {
+                    if (model.ExistingPhotoPath!=null)
+                    {
+                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "avatars",model.ExistingPhotoPath);
+                        System.IO.File.Delete(filePath);
+                    }
+                    stu.PhotoPath= ProcessUploadFile(model);
+                }
+
+                Student updatedstudnet = _studnetRepository.Update(stu);
+      
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
+        }
+
+        public ViewResult Details(int Id)
+        {
+            throw new Exception("在Details视图中抛出异常！！");
+
+            Student student = _studnetRepository.GetStudent(Id);
+
+            if (student==null)
+            {
+                Response.StatusCode = 404;
+
+                return View("StudnetNoFound",Id);
+            }
+    
             HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel()
             {
-                Student = model,
+                Student = student,
                 Title = "学生详情"
             };
             return View(homeDetailsViewModel);
@@ -52,6 +144,29 @@ namespace StudentMenagement.Controllers
         {
             var delStu = _studnetRepository.Delete(Id);
             return "删除成功";
+        }
+
+        /// <summary>
+        /// 将文件保存到指定目录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string ProcessUploadFile(StudentCreateViewModel model) 
+        {
+            string uniqueFileName = null;
+            foreach (IFormFile photo in model.Photos)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "avatars");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream=new FileStream(filePath,FileMode.Create))
+                {
+                    photo.CopyTo(fileStream);
+                }
+                
+            }
+            return uniqueFileName;
         }
 
         //public string Details(int? Id,string name)

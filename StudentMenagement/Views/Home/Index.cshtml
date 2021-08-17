@@ -8,20 +8,30 @@
 <div class="card-deck">
         @foreach (var student in Model)
         {
+            //var photoPath = "~/Images/avatars/" + (student.PhotoPath ?? "weixin.jpg");
+
+            var photoPath = "~/Images/avatars/weixin.jpg";
+
+            if (student.PhotoPath!=null)
+            {
+                photoPath = "~/Images/avatars/" + (student.PhotoPath ?? "weixin.jpg");
+            }
+
+
             <div class="card m-3">
                 <div class="card-header">
                     <h3 class="card-title">@student.Name</h3>
                 </div>
 
-                <img class="card-img-top" src="~/Images/00_系统首页.jpg"  asp-append-version="true" />
+                <img class="card-img-top" src="@photoPath"  asp-append-version="true" />
 
                 <div class="card-body text-center">
-                    <h3 class="card-title">主修科目：@student.MaJob</h3>
+                    <h5 class="card-title">主修科目：@student.MaJor.GetDisplayName()</h5>
                 </div>
 
                 <div class="card-footer text-center">
                     <a asp-controller="home" asp-action="details" asp-route-id="@student.Id" class="btn btn-primary">查看</a>
-                    <a asp-controller="home" asp-action="Detele" asp-route-id="@student.Id" class="btn btn-primary">编辑</a>
+                    <a asp-controller="home" asp-action="Edit" asp-route-id="@student.Id" class="btn btn-primary">编辑</a>
                     <a asp-controller="home" asp-action="Detele" asp-route-id="@student.Id" class="btn btn-primary">删除</a>
 
                 </div>

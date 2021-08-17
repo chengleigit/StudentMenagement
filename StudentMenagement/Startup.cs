@@ -50,6 +50,15 @@ namespace StudentMenagement
             {
                 app.UseDeveloperExceptionPage();
             }
+            else if(env.IsStaging()||env.IsProduction()||env.IsEnvironment("UAT"))
+            {
+                //app.UseStatusCodePages();
+                //app.UseStatusCodePagesWithRedirects("/Error/{0}"); //302
+                //app.UseStatusCodePagesWithReExecute("/Error/{0}");   //404
+
+                app.UseExceptionHandler("/Error");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
+            }
 
             //添加默认文件中间件
             //app.UseDefaultFiles();

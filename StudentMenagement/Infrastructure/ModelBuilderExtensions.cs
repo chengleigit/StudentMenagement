@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace StudentMenagement.Infrastructure
 {
+    /// <summary>
+    /// ModelBuilder扩展类
+    /// </summary>
     public static class ModelBuilderExtensions
     {
         public static void Seed(this ModelBuilder modelBuilder) 
@@ -17,7 +20,7 @@ namespace StudentMenagement.Infrastructure
                {
                    Id = 1,
                    Name = "张三",
-                   MaJob = MaEnum.FirstGrade,
+                   MaJor = MaEnum.ComputerScience,
                    Email = "@ww.com"
                });
             modelBuilder.Entity<Student>().HasData(
@@ -25,7 +28,7 @@ namespace StudentMenagement.Infrastructure
                 {
                     Id = 2,
                     Name = "历史",
-                    MaJob = MaEnum.FirstGrade,
+                    MaJor = MaEnum.Mathematics,
                     Email = "@lisi.com"
                 });
             modelBuilder.Entity<Student>().HasData(
@@ -33,7 +36,7 @@ namespace StudentMenagement.Infrastructure
                 {
                     Id = 3,
                     Name = "赵六",
-                    MaJob = MaEnum.FirstGrade,
+                    MaJor = MaEnum.ElectronicCommerce,
                     Email = "@zhaoliu.com"
                 });
         }
