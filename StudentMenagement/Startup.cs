@@ -1,11 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using StudentMenagement.CustomerMiddlewares;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Infrastructure;
 using StudentMenagement.Models;
@@ -24,14 +28,35 @@ namespace StudentMenagement
         {
             _configuration = configuration;
         } 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+     
         public void ConfigureServices(IServiceCollection services)
         {
 
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(_configuration.GetConnectionString("StudentDBConnection"))
                 );
+
+            services.AddControllersWithViews(config =>
+            {
+                //添加全局身份验证
+                var policy = new AuthorizationPolicyBuilder()
+                                              .RequireAuthenticatedUser()
+                                              .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            }
+           ).AddXmlSerializerFormatters();
+
+            //配置Identity服务
+            services.AddIdentity<ApplicationUser, IdentityRole>(options=> 
+            {
+                options.Password.RequiredLength = 6; //最小长度
+                options.Password.RequiredUniqueChars = 3; //最大重复字符
+                options.Password.RequireNonAlphanumeric = false; //至少有一个非字母数据的字符
+                options.Password.RequireLowercase = false;  //必须包含大写字母
+                options.Password.RequireUppercase = false;  //必须包含小写字母
+            })
+               .AddErrorDescriber<CustomIdentityErrorDescriber>() //覆盖掉英文的错误提示
+               .AddEntityFrameworkStores<AppDbContext>(); ;
 
             //添加MVC服务
             services.AddMvc(a=>a.EnableEndpointRouting=false);
@@ -42,7 +67,6 @@ namespace StudentMenagement
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILogger<Startup> logger)
         {
 
@@ -66,8 +90,11 @@ namespace StudentMenagement
             //添加静态文件中间件
             app.UseStaticFiles();
 
+            //添加验证中间件
+            app.UseAuthentication();
+
             //添加MVC默认路由
-            //app.UseMvcWithDefaultRoute();
+            app.UseMvcWithDefaultRoute();
 
             app.UseMvc(routes=> 
             {
