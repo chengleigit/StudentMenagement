@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Models;
 using StudentMenagement.ViewModels;
@@ -13,12 +14,13 @@ namespace StudentMenagement.Controllers
     {
         private readonly IStudentRepository _studnetRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<HomeController> _logger;
 
-
-        public HomeController(IStudentRepository studnetRepository,IWebHostEnvironment webHostEnvironment)
+        public HomeController(IStudentRepository studnetRepository,IWebHostEnvironment webHostEnvironment,ILogger<HomeController> logger)
         {
             _studnetRepository = studnetRepository;
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
 
         public ActionResult Index()
@@ -121,7 +123,17 @@ namespace StudentMenagement.Controllers
 
         public ViewResult Details(int Id)
         {
-            throw new Exception("在Details视图中抛出异常！！");
+            //throw new Exception("在Details视图中抛出异常！！");
+
+            _logger.LogTrace("Trace（跟踪）log");
+            _logger.LogDebug("Debug（调试）log");
+            _logger.LogInformation("Information（信息）log");
+            _logger.LogWarning("Warning（警告）log");
+            _logger.LogError("Error（错误）log");
+            _logger.LogCritical("Critical（严重）log");
+
+
+
 
             Student student = _studnetRepository.GetStudent(Id);
 

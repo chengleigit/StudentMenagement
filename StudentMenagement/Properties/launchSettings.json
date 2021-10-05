@@ -11,7 +11,7 @@
     "StudentMenagement": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production",//开发环境
+        "ASPNETCORE_ENVIRONMENT": "Production"//开发环境
         //"ASPNETCORE_ENVIRONMENT": "Development",//开发环境
         //"ASPNETCORE_ENVIRONMENT": "Staging"
       },

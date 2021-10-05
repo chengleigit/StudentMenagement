@@ -1,4 +1,5 @@
-﻿using StudentMenagement.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
+using StudentMenagement.Infrastructure;
 using StudentMenagement.Models;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,13 @@ namespace StudentMenagement.DataRepositories
     public class SQLStudentRepository : IStudentRepository
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<SQLStudentRepository> _logger;
 
-        public SQLStudentRepository(AppDbContext context)
+
+        public SQLStudentRepository(AppDbContext context, ILogger<SQLStudentRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public Student Delete(int Id)
@@ -29,6 +33,13 @@ namespace StudentMenagement.DataRepositories
 
         public IEnumerable<Student> GetAllStudents()
         {
+            _logger.LogTrace("学生信息 Trace（跟踪）log");
+            _logger.LogDebug("学生信息 Debug（调试）log");
+            _logger.LogInformation("学生信息 Information（信息）log");
+            _logger.LogWarning("学生信息 Warning（警告）log");
+            _logger.LogError("学生信息 Error（错误）log");
+            _logger.LogCritical("学生信息 Critical（严重）log");
+
             return _context.Studnets;
         }
 

@@ -23,7 +23,7 @@ namespace StudentMenagement
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
-        }
+        } 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -31,7 +31,7 @@ namespace StudentMenagement
 
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(_configuration.GetConnectionString("StudentDBConnection"))
-                ); 
+                );
 
             //Ìí¼ÓMVC·þÎñ
             services.AddMvc(a=>a.EnableEndpointRouting=false);
