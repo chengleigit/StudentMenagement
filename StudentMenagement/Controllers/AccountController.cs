@@ -27,12 +27,12 @@ namespace StudentMenagement.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register() 
+        public IActionResult Register()
         {
             return View();
         }
 
-       
+
         /// <summary>
         /// 注册
         /// </summary>
@@ -48,7 +48,7 @@ namespace StudentMenagement.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    City=model.City
+                    City = model.City
                 };
 
                 //将用户数据存储在AspNetUsers数据库表中
@@ -58,6 +58,13 @@ namespace StudentMenagement.Controllers
                 //并重定向到home econtroller的索引操作
                 if (result.Succeeded)
                 {
+                    //如果用户已登录并属于Admin角色。
+                    //那么就是Admin正在创建新用户。
+                    //所以重定向Admin用户到ListRoles的视图列表
+                    if (_signInManager.IsSignedIn(User) && User.IsInRole("admin"))
+                    {
+                        return RedirectToAction("ListUsers", "admin");
+                    }
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("index", "home");
                 }
@@ -85,7 +92,7 @@ namespace StudentMenagement.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model,string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -138,6 +145,12 @@ namespace StudentMenagement.Controllers
             }
         }
 
-
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
+
+
+    }
 }

@@ -49,8 +49,8 @@ namespace StudentMenagement
             //配置Identity服务
             services.AddIdentity<ApplicationUser, IdentityRole>(options=> 
             {
-                options.Password.RequiredLength = 6; //最小长度
-                options.Password.RequiredUniqueChars = 3; //最大重复字符
+                options.Password.RequiredLength = 1; //最小长度
+                options.Password.RequiredUniqueChars = 1; //最大重复字符
                 options.Password.RequireNonAlphanumeric = false; //至少有一个非字母数据的字符
                 options.Password.RequireLowercase = false;  //必须包含大写字母
                 options.Password.RequireUppercase = false;  //必须包含小写字母
@@ -90,11 +90,14 @@ namespace StudentMenagement
             //添加静态文件中间件
             app.UseStaticFiles();
 
-            //添加验证中间件
+            //添加身份验证中间件
             app.UseAuthentication();
 
             //添加MVC默认路由
             app.UseMvcWithDefaultRoute();
+
+            //添加授权中间件
+            app.UseAuthorization();
 
             app.UseMvc(routes=> 
             {
