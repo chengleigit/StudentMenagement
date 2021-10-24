@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StudentMenagement.Models;
+using System.Linq;
 
 namespace StudentMenagement.Infrastructure
 {
@@ -20,7 +21,14 @@ namespace StudentMenagement.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
+            //获取当前系统所有领域模型的外键列表
+            var foreignKeys = modelBuilder.Model.GetEntityTypes().SelectMany(e=>e.GetForeignKeys());
 
+            foreach (var foreignKey in foreignKeys)
+            {
+                //将它们的删除行为配置为Restrict，即无操作
+                foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+            }
 
             modelBuilder.Seed();
         }
