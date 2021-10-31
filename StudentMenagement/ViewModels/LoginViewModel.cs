@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authentication;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,5 +21,10 @@ namespace StudentMenagement.ViewModels
 
         [Display(Name = "记住我")]
         public bool RememberMe { get; set; }
+
+        public string ReturnUrl { get; set; }
+
+        // AuthenticationScheme 的命名空间是 Microsoft.AspNetCore.Authentication 
+        public IList<AuthenticationScheme> ExternalLogins{get; set;}
     }
 }

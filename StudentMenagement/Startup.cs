@@ -33,7 +33,7 @@ namespace StudentMenagement
         public void ConfigureServices(IServiceCollection services)
         {
             //注入HttpContextAccessor
-            services.AddHttpContextAccessor();
+            //services.AddHttpContextAccessor();
 
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(_configuration.GetConnectionString("StudentDBConnection"))
@@ -57,15 +57,19 @@ namespace StudentMenagement
                 options.Password.RequireNonAlphanumeric = false; //至少有一个非字母数据的字符
                 options.Password.RequireLowercase = false;  //必须包含大写字母
                 options.Password.RequireUppercase = false;  //必须包含小写字母
+
+                options.SignIn.RequireConfirmedEmail = true; //阻止未验证的用户登录
+
             })
                .AddErrorDescriber<CustomIdentityErrorDescriber>() //覆盖掉英文的错误提示
-               .AddEntityFrameworkStores<AppDbContext>(); ;
+               .AddEntityFrameworkStores<AppDbContext>()
+               .AddDefaultTokenProviders();
 
 
             services.AddAuthorization(options =>
             {
                 //策略结合声明授权
-                options.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role","true"));
+                options.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role", "true"));
 
                 //策略结合角色授权
                 options.AddPolicy("SuperAdminPolicy", policy => policy.RequireRole("admin"));
@@ -99,8 +103,8 @@ namespace StudentMenagement
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
 
             //注入自定义授权处理程序
-            services.AddSingleton<IAuthorizationHandler,CanEditOnlyOtherAdminRolesAndClaimsHandler>();
-            services.AddSingleton<IAuthorizationHandler,SuperAdminHandler>();
+            //services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            //services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -119,13 +123,23 @@ namespace StudentMenagement
             });
 
 
+            services.AddAuthentication().AddMicrosoftAccount(microsoftOptions =>
+                {
+                    microsoftOptions.ClientId = _configuration["Authentication:Microsoft:ClientId"];
+                    microsoftOptions.ClientSecret = _configuration["Authentication:Microsoft:ClientSecret"];
+                }).AddGitHub(options =>
+                {
+                    options.ClientId = _configuration["Authentication:GitHub:ClientId"];
+                    options.ClientSecret = _configuration["Authentication:GitHub:ClientSecret"];
+                });
+
         }
 
 
         //授权访问
         private bool AuthorizeAccess(AuthorizationHandlerContext context)
         {
-            return  context.User.IsInRole("admin") &&
+            return context.User.IsInRole("admin") &&
                     context.User.HasClaim(claim => claim.Type == "Edit Role" && claim.Value == "true") ||
                     context.User.IsInRole("Super Admin");
         }
@@ -171,10 +185,6 @@ namespace StudentMenagement
             //{
             //    await context.Response.WriteAsync("Hello Word!");
             //});
-
-
-
-
         }
     }
 }
