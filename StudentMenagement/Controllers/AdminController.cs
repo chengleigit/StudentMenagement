@@ -138,6 +138,8 @@ namespace StudentMenagement.Controllers
         }
 
         [HttpPost]
+        //[Authorize(Policy = "DeleteRolePolicy")] //策略结合声明授权使用
+        [Authorize(Policy = "SuperAdminPolicy")] //策略结合角色授权使用
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
@@ -298,7 +300,7 @@ namespace StudentMenagement.Controllers
                 Email = user.Email,
                 UserName = user.UserName,
                 City = user.City,
-                Claims = userClaims.Select(c => c.Value).ToList(),
+                Claims = userClaims,
                 Roles = userRoles
             };
             return View(model);
@@ -369,6 +371,7 @@ namespace StudentMenagement.Controllers
 
         #region 管理用户中的角色
         [HttpGet]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> ManageUserRoles(string userId)
         {
             ViewBag.userId = userId;
@@ -508,7 +511,7 @@ namespace StudentMenagement.Controllers
 
             // 添加界面上选中的所有声明信息
             result = await _userManager.AddClaimsAsync(user,
-                model.Cliams.Where(c => c.IsSelected).Select(c => new Claim(c.ClaimType, c.ClaimType)));
+                model.Cliams.Where(c => c.IsSelected).Select(c => new Claim(c.ClaimType, c.IsSelected?"true":"false")));
 
             if (!result.Succeeded)
             {
@@ -521,5 +524,19 @@ namespace StudentMenagement.Controllers
         }
 
         #endregion
+
+
+        #region 拒绝访问
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+
+        #endregion
+
     }
 }
