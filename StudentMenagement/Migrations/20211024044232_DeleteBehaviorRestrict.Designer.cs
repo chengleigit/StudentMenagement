@@ -241,7 +241,7 @@ namespace StudentMenagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Studnets");
+                    b.ToTable("Students");
 
                     b.HasData(
                         new

@@ -258,33 +258,7 @@ namespace StudentMenagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Student");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "@ww.com",
-                            EnrollmentDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            MaJor = 1,
-                            Name = "张三"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "@lisi.com",
-                            EnrollmentDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            MaJor = 3,
-                            Name = "历史"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "@zhaoliu.com",
-                            EnrollmentDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            MaJor = 2,
-                            Name = "赵六"
-                        });
+                    b.ToTable("Student", "School");
                 });
 
             modelBuilder.Entity("StudentMenagement.Models.StudentCourse", b =>
@@ -306,7 +280,7 @@ namespace StudentMenagement.Migrations
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("StudentCourse");
+                    b.ToTable("StudentCourse", "School");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

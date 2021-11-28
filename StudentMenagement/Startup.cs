@@ -14,6 +14,7 @@ using StudentMenagement.Application.Students;
 using StudentMenagement.CustomerMiddlewares;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Infrastructure;
+using StudentMenagement.Infrastructure.Data;
 using StudentMenagement.Infrastructure.Repositories;
 using StudentMenagement.Models;
 using StudentMenagement.Security;
@@ -172,6 +173,9 @@ namespace StudentMenagement
                 app.UseExceptionHandler("/Error");
                 app.UseStatusCodePagesWithReExecute("/Error/{0}");
             }
+
+            //数据初始化
+            app.UseDataInitializer();
 
             //添加默认文件中间件
             //app.UseDefaultFiles();

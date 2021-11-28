@@ -10,8 +10,8 @@ using StudentMenagement.Infrastructure;
 namespace StudentMenagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211005142319_Extend_IdentityUser")]
-    partial class Extend_IdentityUser
+    [Migration("20211128104642_Remove_SeedData")]
+    partial class Remove_SeedData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -220,6 +220,22 @@ namespace StudentMenagement.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("StudentMenagement.Models.Course", b =>
+                {
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Credits")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CourseID");
+
+                    b.ToTable("Course", "School");
+                });
+
             modelBuilder.Entity("StudentMenagement.Models.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -229,6 +245,9 @@ namespace StudentMenagement.Migrations
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("MaJor")
                         .HasColumnType("int");
@@ -241,13 +260,14 @@ namespace StudentMenagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Students");
+                    b.ToTable("Student", "School");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             Email = "@ww.com",
+                            EnrollmentDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             MaJor = 1,
                             Name = "张三"
                         },
@@ -255,6 +275,7 @@ namespace StudentMenagement.Migrations
                         {
                             Id = 2,
                             Email = "@lisi.com",
+                            EnrollmentDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             MaJor = 3,
                             Name = "历史"
                         },
@@ -262,9 +283,32 @@ namespace StudentMenagement.Migrations
                         {
                             Id = 3,
                             Email = "@zhaoliu.com",
+                            EnrollmentDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             MaJor = 2,
                             Name = "赵六"
                         });
+                });
+
+            modelBuilder.Entity("StudentMenagement.Models.StudentCourse", b =>
+                {
+                    b.Property<int>("StudentsCourseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int");
+
+                    b.HasKey("StudentsCourseId");
+
+                    b.HasIndex("CourseID");
+
+                    b.HasIndex("StudentID");
+
+                    b.ToTable("StudentCourse", "School");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -272,7 +316,7 @@ namespace StudentMenagement.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -281,7 +325,7 @@ namespace StudentMenagement.Migrations
                     b.HasOne("StudentMenagement.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -290,7 +334,7 @@ namespace StudentMenagement.Migrations
                     b.HasOne("StudentMenagement.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -299,13 +343,13 @@ namespace StudentMenagement.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("StudentMenagement.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -314,8 +358,37 @@ namespace StudentMenagement.Migrations
                     b.HasOne("StudentMenagement.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("StudentMenagement.Models.StudentCourse", b =>
+                {
+                    b.HasOne("StudentMenagement.Models.Course", "Course")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("StudentMenagement.Models.Student", "Student")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("StudentID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("StudentMenagement.Models.Course", b =>
+                {
+                    b.Navigation("StudentCourses");
+                });
+
+            modelBuilder.Entity("StudentMenagement.Models.Student", b =>
+                {
+                    b.Navigation("StudentCourses");
                 });
 #pragma warning restore 612, 618
         }

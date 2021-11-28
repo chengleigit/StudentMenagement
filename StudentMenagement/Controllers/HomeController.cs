@@ -47,26 +47,39 @@ namespace StudentMenagement.Controllers
             _studentService = studentService;
         }
 
-        public async Task<IActionResult> Index(string searchString, int currentPage=1, string sortBy = "Id")
+        public async Task<IActionResult> Index(GetStudentInput input)
         {
-            //判断searchString，如果不为空，则去除查询参数中的空格
-            ViewBag.CurrentFilter = searchString = searchString?.Trim();
-            PaginationModel paginationModel = new PaginationModel();
-            //计算总条数
-            paginationModel.Count = await _studentRepository.CountAsync();
-            //当前页
-            paginationModel.CurrentPage = currentPage;
             //获取分页结果
-            var students = await _studentService.GetPaginatedResult(paginationModel.CurrentPage,searchString, sortBy);
-
-            paginationModel.Data = students.Select(s =>
+            var dtos = await _studentService.GetPaginatedResult(input);
+            dtos.Data = dtos.Data.Select(s =>
             {
                 //加密ID值并存储在EncryptedId属性中
                 s.EncryptedId = _protector.Protect(s.Id.ToString());
                 return s;
             }).ToList();
+            return View(dtos);
 
-            return View(paginationModel);
+            #region 分页
+            ////判断searchString，如果不为空，则去除查询参数中的空格
+            //ViewBag.CurrentFilter = searchString = searchString?.Trim();
+            //PagedResultDto paginationModel = new PagedResultDto();
+            ////计算总条数
+            //paginationModel.Count = await _studentRepository.CountAsync();
+            ////当前页
+            //paginationModel.CurrentPage = currentPage;
+            ////获取分页结果
+            //var students = await _studentService.GetPaginatedResult(paginationModel.CurrentPage,searchString, sortBy);
+
+            //paginationModel.Data = students.Select(s =>
+            //{
+            //    //加密ID值并存储在EncryptedId属性中
+            //    s.EncryptedId = _protector.Protect(s.Id.ToString());
+            //    return s;
+            //}).ToList();
+
+            //return View(paginationModel);
+
+            #endregion
 
             #region 排序
 

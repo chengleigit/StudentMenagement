@@ -22,7 +22,7 @@ namespace StudentMenagement.DataRepositories
 
         public Student Delete(int Id)
         {
-            var student = _context.Studnets.FirstOrDefault(i => i.Id == Id);
+            var student = _context.Students.FirstOrDefault(i => i.Id == Id);
             if (student!=null)
             {
                 _context.Remove(student);
@@ -40,24 +40,24 @@ namespace StudentMenagement.DataRepositories
             _logger.LogError("学生信息 Error（错误）log");
             _logger.LogCritical("学生信息 Critical（严重）log");
 
-            return _context.Studnets;
+            return _context.Students;
         }
 
         public Student GetStudent(int Id)
         {
-            return _context.Studnets.Find(Id);
+            return _context.Students.Find(Id);
         }
 
         public Student Insert(Student student)
         {
-            _context.Studnets.Add(student);
+            _context.Students.Add(student);
             _context.SaveChanges();
             return student;
         }
 
         public Student Update(Student updateStudent)
         {
-            var student = _context.Studnets.Attach(updateStudent);
+            var student = _context.Students.Attach(updateStudent);
             student.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.SaveChanges();
             return updateStudent;
