@@ -16,6 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
+using StudentMenagement.Application.Dtos;
+using StudentMenagement.Application.Students;
 
 namespace StudentMenagement.Controllers
 {
@@ -24,6 +26,7 @@ namespace StudentMenagement.Controllers
         private readonly IRepository<Student, int> _studentRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<HomeController> _logger;
+        private readonly IStudentService _studentService;
 
         //IDataProtector提供了Protect() 和 Unprotect() 方法,可以对数据进行加密或者解密。
         private readonly IDataProtector _protector;
@@ -32,7 +35,8 @@ namespace StudentMenagement.Controllers
             IWebHostEnvironment webHostEnvironment,
             ILogger<HomeController> logger,
             IDataProtectionProvider dataProtectionProvider,
-            DataProtectionPurposeStrings dataProtectionPurposeStrings
+            DataProtectionPurposeStrings dataProtectionPurposeStrings,
+            IStudentService studentService
             )
         {
             _studentRepository = studentRepository;
@@ -40,29 +44,49 @@ namespace StudentMenagement.Controllers
             _logger = logger;
             _protector = dataProtectionProvider.CreateProtector(
                  dataProtectionPurposeStrings.StudentIdRouteValue);
+            _studentService = studentService;
         }
 
-        public async Task<IActionResult> Index(string searchString, int? pageNumber,int pageSize = 10,string sortBy = "Id")
+        public async Task<IActionResult> Index(string searchString, int currentPage=1, string sortBy = "Id")
         {
             //判断searchString，如果不为空，则去除查询参数中的空格
-            ViewBag.CurrentFilter = searchString?.Trim();
-            IQueryable<Student> query = _studentRepository.GetAll();
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                //通过模糊查询表中的Name或Email的值
-                query = query.Where(s => s.Name.Contains(searchString)
-                                       || s.Email.Contains(searchString));
-            }
-            query = query.OrderBy(sortBy).AsNoTracking();
-            var model = query.ToList().Select(s =>
+            ViewBag.CurrentFilter = searchString = searchString?.Trim();
+            PaginationModel paginationModel = new PaginationModel();
+            //计算总条数
+            paginationModel.Count = await _studentRepository.CountAsync();
+            //当前页
+            paginationModel.CurrentPage = currentPage;
+            //获取分页结果
+            var students = await _studentService.GetPaginatedResult(paginationModel.CurrentPage,searchString, sortBy);
+
+            paginationModel.Data = students.Select(s =>
             {
                 //加密ID值并存储在EncryptedId属性中
                 s.EncryptedId = _protector.Protect(s.Id.ToString());
                 return s;
             }).ToList();
-            return View(model);
+
+            return View(paginationModel);
 
             #region 排序
+
+            //IQueryable<Student> query = _studentRepository.GetAll();
+            //if (!String.IsNullOrEmpty(searchString))
+            //{
+            //    //通过模糊查询表中的Name或Email的值
+            //    query = query.Where(s => s.Name.Contains(searchString)
+            //                           || s.Email.Contains(searchString));
+            //}
+            //query = query.OrderBy(sortBy).AsNoTracking();
+            //var model = query.ToList().Select(s =>
+            //{
+            //    //加密ID值并存储在EncryptedId属性中
+            //    s.EncryptedId = _protector.Protect(s.Id.ToString());
+            //    return s;
+            //}).ToList();
+            //return View(model);
+
+
             //IQueryable<Student> query = _studentRepository.GetAll().OrderBy(sortBy).AsNoTracking();
 
             ////查询所有的学生信息

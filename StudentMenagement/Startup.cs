@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using StudentMenagement.Application;
+using StudentMenagement.Application.Students;
 using StudentMenagement.CustomerMiddlewares;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Infrastructure;
@@ -110,6 +112,7 @@ namespace StudentMenagement
 
             services.AddSingleton<DataProtectionPurposeStrings>();
 
+            services.AddScoped<IStudentService, StudentService>();
 
             //注入自定义授权处理程序
             //services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
