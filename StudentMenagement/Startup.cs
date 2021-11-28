@@ -12,8 +12,10 @@ using Microsoft.Extensions.Logging;
 using StudentMenagement.CustomerMiddlewares;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Infrastructure;
+using StudentMenagement.Infrastructure.Repositories;
 using StudentMenagement.Models;
 using StudentMenagement.Security;
+using StudentMenagement.Security.CustomTokenProvider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,8 +102,14 @@ namespace StudentMenagement
             //依赖注入 单例 作用域 瞬间
             //services.AddSingleton<IStudentRepository, MockStudentRepository>();
             services.AddScoped<IStudentRepository, SQLStudentRepository>();
-            services.AddScoped<ICourseRepository, SQLCourseRepository>();
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
+
+            services.AddScoped<ICourseRepository, SQLCourseRepository>();
+
+            services.AddTransient(typeof(IRepository<,>),typeof(RepositoryBase<,>));
+
+            services.AddSingleton<DataProtectionPurposeStrings>();
+
 
             //注入自定义授权处理程序
             //services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();

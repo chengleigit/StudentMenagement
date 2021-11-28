@@ -23,6 +23,11 @@ namespace StudentMenagement.ViewModels
         public string Email { get; set; }
         [Display(Name = "头像")]
         public List<IFormFile> Photos { get; set; }
+        /// <summary>
+        /// 入学时间
+        /// </summary>
+        [Display(Name = "入学时间")]
+        public DateTime EnrollmentDate { get; set; }
     }
 
 
