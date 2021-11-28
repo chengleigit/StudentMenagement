@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NetCore.AutoRegisterDi;
 using StudentMenagement.Application;
 using StudentMenagement.Application.Courses;
 using StudentMenagement.Application.Students;
@@ -30,12 +31,12 @@ namespace StudentMenagement
     public class Startup
     {
         private IWebHostEnvironment _env;
-        private  IConfiguration _configuration;
+        private IConfiguration _configuration;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             _configuration = configuration;
-            _env= env;
+            _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -48,18 +49,18 @@ namespace StudentMenagement
                 );
 
 
-            var builder= services.AddControllersWithViews(config =>
-            {
+            var builder = services.AddControllersWithViews(config =>
+             {
                 //添加全局身份验证
                 var policy = new AuthorizationPolicyBuilder()
-                                              .RequireAuthenticatedUser()
-                                              .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-                
-                var policy1 = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                config.Filters.Add(new AuthorizeFilter(policy1));
+                                               .RequireAuthenticatedUser()
+                                               .Build();
+                 config.Filters.Add(new AuthorizeFilter(policy));
 
-            }).AddXmlSerializerFormatters();
+                 var policy1 = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                 config.Filters.Add(new AuthorizeFilter(policy1));
+
+             }).AddXmlSerializerFormatters();
 
             //Razor视图条件运行时编译
             if (_env.IsDevelopment())
@@ -115,19 +116,20 @@ namespace StudentMenagement
             //添加MVC服务
             services.AddMvc(a => a.EnableEndpointRouting = false);
 
+            //自动注入服务到依赖注入容器
+            //services.RegisterAssemblyPublicNonGenericClasses()
+            //    .Where(c => c.Name.EndsWith("Service"))
+            //    .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+            //.AsPublicImplementedInterfaces();
+
             //依赖注入 单例 作用域 瞬间
             //services.AddSingleton<IStudentRepository, MockStudentRepository>();
             services.AddScoped<IStudentRepository, SQLStudentRepository>();
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
-
-            services.AddScoped<ICourseRepository, SQLCourseRepository>();
-
+            //services.AddScoped<ICourseRepository, SQLCourseRepository>();
             services.AddTransient(typeof(IRepository<,>),typeof(RepositoryBase<,>));
-
             services.AddSingleton<DataProtectionPurposeStrings>();
-
             services.AddScoped<IStudentService, StudentService>();
-
             services.AddScoped <ICourseService,CourseService>();
 
             //注入自定义授权处理程序

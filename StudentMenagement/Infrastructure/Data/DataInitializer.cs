@@ -242,8 +242,8 @@ namespace StudentMenagement.Infrastructure.Data
                 }
 
                 var user = new ApplicationUser
-                { Email = "ltm@ddxc.org", UserName = "ltm@ddxc.org", EmailConfirmed = true, City = "上海" };
-                userManager.CreateAsync(user, "bb123456").Wait();// 等待异步方法执行完毕
+                { Email = "10924353902@qq.com", UserName = "1094353902@qq.com", EmailConfirmed = true, City = "合肥" };
+                userManager.CreateAsync(user, "1").Wait();// 等待异步方法执行完毕
                 dbcontext.SaveChanges();
                 var adminRole = "Admin";
 
