@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StudentMenagement.Application;
+using StudentMenagement.Application.Courses;
 using StudentMenagement.Application.Students;
 using StudentMenagement.CustomerMiddlewares;
 using StudentMenagement.DataRepositories;
@@ -28,11 +29,13 @@ namespace StudentMenagement
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
+        private IWebHostEnvironment _env;
+        private  IConfiguration _configuration;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             _configuration = configuration;
+            _env= env;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -44,15 +47,25 @@ namespace StudentMenagement
                 options => options.UseSqlServer(_configuration.GetConnectionString("StudentDBConnection"))
                 );
 
-            services.AddControllersWithViews(config =>
+
+            var builder= services.AddControllersWithViews(config =>
             {
                 //添加全局身份验证
                 var policy = new AuthorizationPolicyBuilder()
                                               .RequireAuthenticatedUser()
                                               .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
+                
+                var policy1 = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                config.Filters.Add(new AuthorizeFilter(policy1));
+
+            }).AddXmlSerializerFormatters();
+
+            //Razor视图条件运行时编译
+            if (_env.IsDevelopment())
+            {
+                builder.AddRazorRuntimeCompilation();
             }
-           ).AddXmlSerializerFormatters();
 
             //配置Identity服务
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -114,6 +127,8 @@ namespace StudentMenagement
             services.AddSingleton<DataProtectionPurposeStrings>();
 
             services.AddScoped<IStudentService, StudentService>();
+
+            services.AddScoped <ICourseService,CourseService>();
 
             //注入自定义授权处理程序
             //services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();

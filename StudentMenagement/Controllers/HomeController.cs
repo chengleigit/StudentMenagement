@@ -166,7 +166,7 @@ namespace StudentMenagement.Controllers
 
                 var encryptedId = _protector.Protect(newStudent.Id.ToString());
 
-                return RedirectToAction("Details",new { id = encryptedId });
+                return RedirectToAction("Details", new { id = encryptedId });
             }
             return View();
 
@@ -209,7 +209,7 @@ namespace StudentMenagement.Controllers
         }
 
         [HttpGet]
-        public ViewResult Edit(string Id) 
+        public ViewResult Edit(string Id)
         {
             var student = DecryptedStudent(Id);
             if (student == null)
@@ -271,7 +271,7 @@ namespace StudentMenagement.Controllers
                     //因此我们会检查当前学生信息中是否有图片，有的话，就会删除它
                     if (model.ExistingPhotoPath != null)
                     {
-                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath,"images","avatars",model.ExistingPhotoPath);
+                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars", model.ExistingPhotoPath);
                         if (System.IO.File.Exists(filePath))
                         {
                             System.IO.File.Delete(filePath);
@@ -336,7 +336,7 @@ namespace StudentMenagement.Controllers
                 ViewBag.ErrorMessage = $"学生Id={Id}的信息不存在，请重试。";
                 return View("NotFound");
             }
-    
+
             HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel()
             {
                 Student = student,
@@ -372,7 +372,7 @@ namespace StudentMenagement.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public string ProcessUploadFile(StudentCreateViewModel model) 
+        public string ProcessUploadFile(StudentCreateViewModel model)
         {
             string uniqueFileName = null;
             foreach (IFormFile photo in model.Photos)
@@ -381,13 +381,29 @@ namespace StudentMenagement.Controllers
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var fileStream=new FileStream(filePath,FileMode.Create))
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     photo.CopyTo(fileStream);
                 }
-                
+
             }
             return uniqueFileName;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> About()
+        {
+            //获取IQueryable类型的Student，然后通过student.EnrollmentDate进行分组
+            var data = from student in _studentRepository.GetAll()
+                       group student by student.EnrollmentDate into dateGroup
+
+                       select new EnrollmentDateGroupDto()
+                       {
+                           EnrollmentDate = dateGroup.Key,
+                           StudentCount = dateGroup.Count()
+                       };
+            var dtos = await data.AsNoTracking().ToListAsync();
+            return View(dtos);
         }
 
         //public string Details(int? Id,string name)

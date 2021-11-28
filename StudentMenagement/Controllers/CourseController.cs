@@ -1,20 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StudentMenagement.Application.Courses;
+using StudentMenagement.Application.Dtos;
 using StudentMenagement.DataRepositories;
+using System.Threading.Tasks;
 
 namespace StudentMenagement.Controllers
 {
     public class CourseController:Controller
     {
-        private readonly ICourseRepository _courseRepository;
-        public CourseController(ICourseRepository courseRepository)
+        private readonly ICourseService _courseService;
+        public CourseController(ICourseService courseService)
         {
-            _courseRepository = courseRepository;
+            _courseService = courseService;
         }
 
         // 不填写 [HttpGet]默认为处理GET请求
-        public ActionResult Index()
+        public async Task<ActionResult> Index(GetCourseInput input)
         {
-            return View();
+            var models = await _courseService.GetPaginatedResult(input);
+            return View(models);
         }
     }
 }
