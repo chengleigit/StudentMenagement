@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace StudentMenagement.Controllers
 {
@@ -40,10 +42,12 @@ namespace StudentMenagement.Controllers
                  dataProtectionPurposeStrings.StudentIdRouteValue);
         }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index(int? pageNumber,int pageSize = 10,string sortBy = "Id")
         {
+            IQueryable<Student> query = _studentRepository.GetAll().OrderBy(sortBy).AsNoTracking();
+
             //查询所有的学生信息
-            List<Student> model = _studentRepository.GetAllList().Select(s => {
+            List<Student> model = query.ToList().Select(s => {
                 //加密ID值并存储在EncryptedId属性中
                 s.EncryptedId = _protector.Protect(s.Id.ToString());
                 return s;
@@ -51,6 +55,32 @@ namespace StudentMenagement.Controllers
 
             //将学生列表传递到视图
             return View(model);
+
+
+            #region 排序
+            //ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            //ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            //var students = _studentRepository.GetAll();
+            //switch (sortOrder)
+            //{
+            //    case "name_desc":
+            //        students = students.OrderByDescending(s => s.Name);
+            //        break;
+            //    case "Date":
+            //        students = students.OrderBy(s => s.EnrollmentDate);
+            //        break;
+            //    case "date_desc":
+            //        students = students.OrderByDescending(s => s.EnrollmentDate);
+            //        break;
+            //    default:
+            //        students = students.OrderBy(s => s.Name);
+            //        break;
+            //}
+
+            //return View(students);
+
+
+            #endregion
         }
 
         [HttpGet]

@@ -4,96 +4,115 @@
     ViewBag.Title = "学生列表";
 }
 
-  <div class="row">
+<div class="row">
     <table class="table table-bordered table-striped">
-      <thead>
-        <tr>
-          <th scope="col">头像</th>
-          <th scope="col">名字</th>
-          <th scope="col">邮箱地址</th>
-          <th scope="col">主修科目</th>
-          <th scope="col">入学时间</th>
-          <th scope="col">操作</th>
-        </tr>
-      </thead>
-      <tbody>
-         @foreach (var student in Model)
+        <thead>
+            <tr>
+
+                <th scope="col">头像</th>
+                <th scope="col" class="sort-link">
+                    <a asp-action="Index" asp-route-sortby="Name"> 名字  </a>
+                    <a class="pl-3" asp-action="Index" asp-route-sortby="Name desc">  降序  </a>
+                </th>
+                <th>
+                    <a asp-action="Index" asp-route-sortby="Email ">  邮箱地址 </a>
+                    <a class="pl-3" asp-action="Index" asp-route-sortby="Email desc"> 降序  </a>
+                </th>
+                <th scope="col">
+                    <a class="pl-3" asp-action="Index" asp-route-sortby="Major ">  主修科目</a>
+                    <a class="pl-3" asp-action="Index" asp-route-sortby="Major desc">  降序  </a>
+                </th>
+                <th scope="col">
+                    <a class="pl-3" asp-action="Index" asp-route-sortby="Major ">  入学时间 </a>
+
+                    <a class="pl-3" asp-action="Index" asp-route-sortby="EnrollmentDate desc">  降序 </a>
+                </th>
+                @*  <th scope="col">头像</th>
+                    <th scope="col">名字</th>
+                    <th scope="col">邮箱地址</th>
+                    <th scope="col">主修科目</th>
+                    <th scope="col">入学时间</th>
+                    <th scope="col">操作</th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                var photoPath = "~/images/weixin.jpg";
+                if (student.PhotoPath != null)
                 {
-                    var photoPath = "~/images/weixin.jpg";
-                    if (student.PhotoPath != null)
-                    {
-                        photoPath = "~/images/avatars/" + student.PhotoPath;
-                    }
-                    <tr>
-                        <td>
-                            <img class="table-img  imageThumbnail " src="@photoPath" asp-append-version="true" />
-                        </td>
-                        <th scope="row">@student.Name</th>
-                        <td>@student.Email</td>
-
-                        <td> @student.MaJor.GetDisplayName()</td>
-                        <td> @student.EnrollmentDate.ToString("yyyy-MM-dd")</td>
-                        <td>
-                            <form method="post" asp-action="Detele" asp-route-id="@student.Id">
-                                <a asp-controller="Home" class="btn btn-info" asp-action="Details" asp-route-id="@student.EncryptedId">查看</a>
-                                <a asp-controller="home" asp-action="edit" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">编辑</a>
-
-                                <span id="confirmDeleteSpan_@student.Id" style="display: none">
-                                    <span>你确定你要删除?</span>
-                                    <button type="submit" class="btn btn-danger">是</button>
-                                    <a href="#"
-                                       class="btn btn-primary"
-                                       onclick="confirmDelete('@student.Id', false)">
-                                        否
-                                    </a>
-                                </span>
-
-                                <span id="deleteSpan_@student.Id">
-                                    <a href="#" class="btn btn-danger" onclick="confirmDelete('@student.Id', true)">删除</a>
-                                </span>
-                            </form>
-                    </tr>
+                    photoPath = "~/images/avatars/" + student.PhotoPath;
                 }
-      </tbody>
-    </table>
-  </div>
+                <tr>
+                    <td>
+                        <img class="table-img  imageThumbnail " src="@photoPath" asp-append-version="true" />
+                    </td>
+                    <th scope="row">@student.Name</th>
+                    <td>@student.Email</td>
 
-  @section Scripts {
-    <script src="~/javascript/CustomScript.js" asp-append-version="true"></script>
+                    <td> @student.MaJor.GetDisplayName()</td>
+                    <td> @student.EnrollmentDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <form method="post" asp-action="Detele" asp-route-id="@student.Id">
+                            <a asp-controller="Home" class="btn btn-info" asp-action="Details" asp-route-id="@student.EncryptedId">查看</a>
+                            <a asp-controller="home" asp-action="edit" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">编辑</a>
+
+                            <span id="confirmDeleteSpan_@student.Id" style="display: none">
+                                <span>你确定你要删除?</span>
+                                <button type="submit" class="btn btn-danger">是</button>
+                                <a href="#"
+                               class="btn btn-primary"
+                               onclick="confirmDelete('@student.Id', false)">
+                                    否
+                                </a>
+                            </span>
+
+                            <span id="deleteSpan_@student.Id">
+                                <a href="#" class="btn btn-danger" onclick="confirmDelete('@student.Id', true)">删除</a>
+                            </span>
+                        </form>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script src="~/javascript/CustomScript.js" asp-append-version="true"></script>
 }
 
 
 @*<div class="card-deck">
-        @foreach (var student in Model)
-        {
-            //var photoPath = "~/Images/avatars/" + (student.PhotoPath ?? "weixin.jpg");
+    @foreach (var student in Model)
+    {
+    //var photoPath = "~/Images/avatars/" + (student.PhotoPath ?? "weixin.jpg");
 
-            var photoPath = "~/Images/avatars/weixin.jpg";
+    var photoPath = "~/Images/avatars/weixin.jpg";
 
-            if (student.PhotoPath!=null)
-            {
-                photoPath = "~/Images/avatars/" + (student.PhotoPath ?? "weixin.jpg");
-            }
+    if (student.PhotoPath!=null)
+    {
+    photoPath = "~/Images/avatars/" + (student.PhotoPath ?? "weixin.jpg");
+    }
 
 
-            <div class="card m-3">
-                <div class="card-header">
-                    <h3 class="card-title">@student.Name</h3>
-                </div>
+    <div class="card m-3">
+    <div class="card-header">
+    <h3 class="card-title">@student.Name</h3>
+    </div>
 
-                <img class="card-img-top" src="@photoPath"  asp-append-version="true" />
+    <img class="card-img-top" src="@photoPath"  asp-append-version="true" />
 
-                <div class="card-body text-center">
-                    <h5 class="card-title">主修科目：@student.MaJor.GetDisplayName()</h5>
-                </div>
+    <div class="card-body text-center">
+    <h5 class="card-title">主修科目：@student.MaJor.GetDisplayName()</h5>
+    </div>
 
-                <div class="card-footer text-center">
-                    <a asp-controller="home" class="btn btn-info" asp-action="details" asp-route-id="@student.Id" >查看</a>
-                    <a asp-controller="home" class="btn btn-primary m-1" asp-action="Edit" asp-route-id="@student.Id" >编辑</a>
-                    <a asp-controller="home" class="btn btn-danger" asp-action="Detele" asp-route-id="@student.Id" >删除</a>
+    <div class="card-footer text-center">
+    <a asp-controller="home" class="btn btn-info" asp-action="details" asp-route-id="@student.Id" >查看</a>
+    <a asp-controller="home" class="btn btn-primary m-1" asp-action="Edit" asp-route-id="@student.Id" >编辑</a>
+    <a asp-controller="home" class="btn btn-danger" asp-action="Detele" asp-route-id="@student.Id" >删除</a>
 
-                </div>
+    </div>
 
-            </div>
-        }
+    </div>
+    }
     </div>*@
