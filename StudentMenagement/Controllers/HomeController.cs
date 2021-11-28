@@ -42,22 +42,40 @@ namespace StudentMenagement.Controllers
                  dataProtectionPurposeStrings.StudentIdRouteValue);
         }
 
-        public async Task<IActionResult> Index(int? pageNumber,int pageSize = 10,string sortBy = "Id")
+        public async Task<IActionResult> Index(string searchString, int? pageNumber,int pageSize = 10,string sortBy = "Id")
         {
-            IQueryable<Student> query = _studentRepository.GetAll().OrderBy(sortBy).AsNoTracking();
-
-            //查询所有的学生信息
-            List<Student> model = query.ToList().Select(s => {
+            //判断searchString，如果不为空，则去除查询参数中的空格
+            ViewBag.CurrentFilter = searchString?.Trim();
+            IQueryable<Student> query = _studentRepository.GetAll();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                //通过模糊查询表中的Name或Email的值
+                query = query.Where(s => s.Name.Contains(searchString)
+                                       || s.Email.Contains(searchString));
+            }
+            query = query.OrderBy(sortBy).AsNoTracking();
+            var model = query.ToList().Select(s =>
+            {
                 //加密ID值并存储在EncryptedId属性中
                 s.EncryptedId = _protector.Protect(s.Id.ToString());
                 return s;
             }).ToList();
-
-            //将学生列表传递到视图
             return View(model);
 
-
             #region 排序
+            //IQueryable<Student> query = _studentRepository.GetAll().OrderBy(sortBy).AsNoTracking();
+
+            ////查询所有的学生信息
+            //List<Student> model = query.ToList().Select(s => {
+            //    //加密ID值并存储在EncryptedId属性中
+            //    s.EncryptedId = _protector.Protect(s.Id.ToString());
+            //    return s;
+            //}).ToList();
+
+            ////将学生列表传递到视图
+            //return View(model);
+
+
             //ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             //ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
             //var students = _studentRepository.GetAll();
