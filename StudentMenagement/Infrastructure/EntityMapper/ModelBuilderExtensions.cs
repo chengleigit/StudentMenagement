@@ -44,6 +44,7 @@ namespace StudentMenagement.Infrastructure
             modelBuilder.Entity<Course>().ToTable("Course", "School");
             modelBuilder.Entity<StudentCourse>().ToTable("StudentCourse", "School");
             modelBuilder.Entity<Student>().ToTable("Student", "School");
+            modelBuilder.Entity<CourseAssignment>().HasKey(c => new { c.CourseID,c.TeacherID });
         }
 
         
