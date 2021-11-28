@@ -100,6 +100,7 @@ namespace StudentMenagement
             //依赖注入 单例 作用域 瞬间
             //services.AddSingleton<IStudentRepository, MockStudentRepository>();
             services.AddScoped<IStudentRepository, SQLStudentRepository>();
+            services.AddScoped<ICourseRepository, SQLCourseRepository>();
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
 
             //注入自定义授权处理程序

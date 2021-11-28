@@ -12,6 +12,8 @@ namespace StudentMenagement.Infrastructure
         }
 
         public DbSet<Student> Studnets { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<StudentCourse> StudentCourses { get; set; }
 
         /// <summary>
         /// 播种数据
@@ -31,6 +33,11 @@ namespace StudentMenagement.Infrastructure
             }
 
             modelBuilder.Seed();
+
+            ///指定实体在数据库中生成的名称
+            modelBuilder.Entity<Course>().ToTable("Course","School");
+            modelBuilder.Entity<StudentCourse>().ToTable("StudentCourse");
+            modelBuilder.Entity<Student>().ToTable("Student");
         }
     }
 }
