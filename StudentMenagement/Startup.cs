@@ -72,9 +72,8 @@ namespace StudentMenagement
 
             #region 策略授权
 
-
             //配置Identity服务
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 1; //最小长度
                 options.Password.RequiredUniqueChars = 1; //最大重复字符
@@ -86,10 +85,17 @@ namespace StudentMenagement
 
                 //通过自定义的CustomEmailConfirmation名称来覆盖旧有token名称，是//它与AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser//>>("CustomEmailConfirmation")关联在一起
                 options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
-            })
-               .AddErrorDescriber<CustomIdentityErrorDescriber>() //覆盖掉英文的错误提示
-               .AddEntityFrameworkStores<AppDbContext>()
-               .AddDefaultTokenProviders();
+
+                //登录失败5次将锁定15分钟
+                options.Lockout.MaxFailedAccessAttempts = 5; 
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            });
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+              .AddErrorDescriber<CustomIdentityErrorDescriber>() //覆盖掉英文的错误提示
+              .AddEntityFrameworkStores<AppDbContext>()
+                    .AddDefaultTokenProviders();
+                    //.AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>("CustomEmailConfirmation");
 
 
 

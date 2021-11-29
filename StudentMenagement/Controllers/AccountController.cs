@@ -129,8 +129,17 @@ namespace StudentMenagement.Controllers
                     return View(model);
                 }
 
+
+                //在PasswordSignInAsync()中我们将最后一个参数从false修改为true，
+                //用于启用账户锁定
+                //每次登录失败后，都会将AspNetUsers表中的AccessFailedCount列值
+                //增加1。当它等于5时
+                //MaxFailedAccessAttempts将会锁定账户，然后修改LockoutEnd列，
+                //添加解锁时间
+                //即使我们提供正确的用户名和密码，PasswordSignInAsync()方法的返回
+                //值依然是Lockedout，即被锁定
                 var result = await _signInManager.PasswordSignInAsync(
-                    model.Email, model.Password, model.RememberMe, false);
+                    model.Email, model.Password, model.RememberMe, true);
 
                 if (result.Succeeded)
                 {
@@ -145,6 +154,13 @@ namespace StudentMenagement.Controllers
                     {
                         return RedirectToAction("index", "home");
                     }
+                }
+
+                //如果账户状态为IsLockedOut，那么我们重定向到AccountLocked
+                //视图，提示账户被锁定
+                if (result.IsLockedOut)
+                {
+                    return View("AccountLocked");
                 }
 
                 ModelState.AddModelError(string.Empty, "登录失败，请重试");
@@ -453,6 +469,15 @@ namespace StudentMenagement.Controllers
                     var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     if (result.Succeeded)
                     {
+                        //密码成功重置后，如果当前账户被锁定，则设置该账户锁定
+                        //结束时间为当前UTC日期时间
+                        //这样用户就可以用新密码登录系统
+                        if (await _userManager.IsLockedOutAsync(user))
+                        {
+                            await _userManager.SetLockoutEndDateAsync(user,DateTimeOffset.UtcNow);
+                            //DateTimeOffset指的是UTC日期时间即格林威治时间。
+                        }
+
                         return View("ResetPasswordConfirmation");
                     }
                     //显示验证错误信息。触发行为，当密码重置令牌已用，或密码复杂性规则不符合标准时
