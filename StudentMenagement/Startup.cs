@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using NetCore.AutoRegisterDi;
 using StudentMenagement.Application;
 using StudentMenagement.Application.Courses;
+using StudentMenagement.Application.Departments;
 using StudentMenagement.Application.Students;
 using StudentMenagement.Application.Teachers;
 using StudentMenagement.CustomerMiddlewares;
@@ -185,6 +186,7 @@ namespace StudentMenagement
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<IDepartmentsService, DepartmentsService>();
 
             #endregion
 

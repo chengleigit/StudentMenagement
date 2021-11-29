@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using StudentMenagement.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace StudentMenagement.Models
+namespace StudentMenagement.ViewModels.Departments
 {
-    /// <summary>
-    /// 学院
-    /// </summary>
-    public class Department
+    public class DepartmentCreateViewModel
     {
         public int DepartmentID { get; set; }
 
         [StringLength(50,MinimumLength = 3)]
+        [Display(Name = "学院名称")]
         public string Name { get; set; }
-
         /// <summary>
         /// 预算
         /// </summary>
         [DataType(DataType.Currency)]
-        [Column(TypeName = "money")]
+        [Display(Name = "预算")]
         public decimal Budget { get; set; }
 
         /// <summary>
@@ -30,15 +27,14 @@ namespace StudentMenagement.Models
         [Display(Name = "成立时间")]
         public DateTime StartDate { get; set; }
 
-        public int? TeacherID { get; set; }
-        /// <summary>
-        /// 学院主任
-        /// </summary>
-        public Teacher Administrator { get; set; }
-        public ICollection<Course> Courses { get; set; }
-
-
         [Timestamp]
         public byte[] RowVersion { get; set; }
+
+        [Display(Name = "负责人")]
+        public SelectList TeacherList { get; set; }
+
+        public int? TeacherID { get; set; }
+
+        public Teacher Administrator { get; set; }
     }
 }
