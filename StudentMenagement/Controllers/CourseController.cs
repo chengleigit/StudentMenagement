@@ -16,13 +16,17 @@ namespace StudentMenagement.Controllers
         private readonly ICourseService _courseService;
         private readonly IRepository<Course, int> _courseRepository;
         private readonly IRepository<Department, int> _departmentRepository;
+        private readonly IRepository<CourseAssignment, int> _courseAssignmentsRepository;
+
         public CourseController(ICourseService courseService,
             IRepository<Course, int> courseRepository,
-            IRepository<Department, int> departmentRepository)
+            IRepository<Department, int> departmentRepository,
+            IRepository<CourseAssignment, int> courseAssignmentsRepository)
         {
             _courseService = courseService;
             _courseRepository = courseRepository;
             _departmentRepository = departmentRepository;
+            _courseAssignmentsRepository = courseAssignmentsRepository;
         }
 
         // 不填写 [HttpGet]默认为处理GET请求
@@ -121,6 +125,41 @@ namespace StudentMenagement.Controllers
 
         #endregion
 
+        #region 删除功能
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+
+            var model = await _courseRepository.FirstOrDefaultAsync(a => a.CourseID == id);
+
+
+            if (model == null)
+            {
+                ViewBag.ErrorMessage = $"课程编号{id}的信息不存在，请重试。";
+                return View("NotFound");
+            }
+
+            await _courseAssignmentsRepository.DeleteAsync(a => a.CourseID == model.CourseID);
+            await _courseRepository.DeleteAsync(a => a.CourseID == id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        #endregion
+
+        public async Task<ViewResult> Details(int courseId)
+        {
+
+            var course = await _courseRepository.GetAll().Include(a => a.Department).FirstOrDefaultAsync(a => a.CourseID == courseId);
+
+            //判断学生信息是否存在
+            if (course == null)
+            {
+                ViewBag.ErrorMessage = $"课程编号{courseId}的信息不存在，请重试。";
+                return View("NotFound");
+            }
+
+            return View(course);
+        }
 
         /// <summary>
         /// 学院的下拉列表
