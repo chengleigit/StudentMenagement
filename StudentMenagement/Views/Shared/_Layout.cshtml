@@ -52,7 +52,7 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="home" asp-action="About">关于我们</a>
                     </li>
-                    @if (_signInManager.IsSignedIn(User) && User.IsInRole("admin"))
+                    @if (_signInManager.IsSignedIn(User))
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle"
@@ -63,10 +63,29 @@
                            aria-expanded="false">
                                 管理
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" asp-controller="Admin" asp-action="ListUsers">用户列表</a>
-                                <a class="dropdown-item" asp-controller="Admin" asp-action="ListRoles">角色列表</a>
+
+                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+                                @if (User.IsInRole("admin"))
+                                {
+                                    <a class="dropdown-item" asp-controller="Admin" asp-action="ListUsers">用户列表</a>
+                                    <a class="dropdown-item" asp-controller="Admin" asp-action="ListRoles">角色列表</a>
+                                }
+                                <a class="dropdown-item" asp-controller="Account"
+                                   asp-action="ChangePassword">
+                                    密码管理
+                                </a>
                             </div>
+
+                           @* @if (User.IsInRole("admin"))
+                            {
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" asp-controller="Admin" asp-action="ListUsers">用户列表</a>
+                                    <a class="dropdown-item" asp-controller="Admin" asp-action="ListRoles">角色列表</a>
+                                </div>
+                            }
+
+                            <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword"> 密码管理</a>*@
                         </li>
                     }
                 </ul>

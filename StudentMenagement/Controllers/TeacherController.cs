@@ -195,7 +195,8 @@ namespace StudentMenagement.Controllers
         /// <param name="teacher"> </param>
         /// <returns> </returns>
         private List<AssignedCourseViewModel> AssignedCourseDroupDownList(Teacher teacher)
-        {//获取课程列表
+        {
+            //获取课程列表
             var allCourses = _courseRepository.GetAllList();
             //获取教师当前教授的课程
             var teacherCourses = new HashSet<int>(teacher.CourseAssignments.Select(c => c.CourseID));

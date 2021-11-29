@@ -69,6 +69,10 @@ namespace StudentMenagement
                 builder.AddRazorRuntimeCompilation();
             }
 
+
+            #region 策略授权
+
+
             //配置Identity服务
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -80,10 +84,18 @@ namespace StudentMenagement
 
                 options.SignIn.RequireConfirmedEmail = true; //阻止未验证的用户登录
 
+                //通过自定义的CustomEmailConfirmation名称来覆盖旧有token名称，是//它与AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser//>>("CustomEmailConfirmation")关联在一起
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
             })
                .AddErrorDescriber<CustomIdentityErrorDescriber>() //覆盖掉英文的错误提示
                .AddEntityFrameworkStores<AppDbContext>()
                .AddDefaultTokenProviders();
+
+
+
+            //设置令牌的有效期为10S
+            //services.Configure<DataProtectionTokenProviderOptions>(
+            //  o =>o.TokenLifespan = TimeSpan.FromSeconds(10));
 
 
             services.AddAuthorization(options =>
@@ -114,27 +126,6 @@ namespace StudentMenagement
                 //options.InvokeHandlersAfterFailure = false;
             });
 
-            //添加MVC服务
-            services.AddMvc(a => a.EnableEndpointRouting = false);
-
-            //自动注入服务到依赖注入容器
-            //services.RegisterAssemblyPublicNonGenericClasses()
-            //    .Where(c => c.Name.EndsWith("Service"))
-            //    .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
-            //.AsPublicImplementedInterfaces();
-
-            //依赖注入 单例 作用域 瞬间
-            //services.AddSingleton<IStudentRepository, MockStudentRepository>();
-
-            //services.AddTransient<IStudentRepository, MockStudentRepository>();
-            //services.AddScoped<ICourseRepository, SQLCourseRepository>();
-            services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
-            services.AddSingleton<DataProtectionPurposeStrings>();
-            services.AddScoped<IStudentRepository, SQLStudentRepository>();
-            services.AddScoped<IStudentService, StudentService>();
-            services.AddScoped<ICourseService, CourseService>();
-            services.AddScoped<ITeacherService, TeacherService>();
-
             //注入自定义授权处理程序
             //services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             //services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
@@ -155,16 +146,46 @@ namespace StudentMenagement
                 options.SlidingExpiration = true;
             });
 
-
             services.AddAuthentication().AddMicrosoftAccount(microsoftOptions =>
-                {
-                    microsoftOptions.ClientId = _configuration["Authentication:Microsoft:ClientId"];
-                    microsoftOptions.ClientSecret = _configuration["Authentication:Microsoft:ClientSecret"];
-                }).AddGitHub(options =>
-                {
-                    options.ClientId = _configuration["Authentication:GitHub:ClientId"];
-                    options.ClientSecret = _configuration["Authentication:GitHub:ClientSecret"];
-                });
+            {
+                microsoftOptions.ClientId = _configuration["Authentication:Microsoft:ClientId"];
+                microsoftOptions.ClientSecret = _configuration["Authentication:Microsoft:ClientSecret"];
+            }).AddGitHub(options =>
+            {
+                options.ClientId = _configuration["Authentication:GitHub:ClientId"];
+                options.ClientSecret = _configuration["Authentication:GitHub:ClientSecret"];
+            });
+
+            #endregion
+
+            //添加MVC服务
+            services.AddMvc(a => a.EnableEndpointRouting = false);
+
+            #region 依赖注入
+            //自动注入服务到依赖注入容器
+            //services.RegisterAssemblyPublicNonGenericClasses()
+            //    .Where(c => c.Name.EndsWith("Service"))
+            //    .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+            //.AsPublicImplementedInterfaces();
+
+            //依赖注入 单例 作用域 瞬间
+            //services.AddSingleton<IStudentRepository, MockStudentRepository>();
+
+            //services.AddTransient<IStudentRepository, MockStudentRepository>();
+            //services.AddScoped<ICourseRepository, SQLCourseRepository>();
+            services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
+            services.AddSingleton<DataProtectionPurposeStrings>();
+            services.AddScoped<IStudentRepository, SQLStudentRepository>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<ITeacherService, TeacherService>();
+
+            #endregion
+
+
+
+
+
 
         }
 

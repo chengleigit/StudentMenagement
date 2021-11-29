@@ -10,7 +10,7 @@ using StudentMenagement.Infrastructure;
 namespace StudentMenagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211128132130_InitializationData")]
+    [Migration("20211129101144_InitializationData")]
     partial class InitializationData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

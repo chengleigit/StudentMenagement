@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StudentMenagement.Models;
 using StudentMenagement.ViewModels;
+using StudentMenagement.ViewModels.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,7 +69,7 @@ namespace StudentMenagement.Controllers
                     //生成电子邮件确认令牌
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     //生成电子邮件的确认链接
-                    var confirmationLink = Url.Action("ConfirmEmail", "Account", 
+                    var confirmationLink = Url.Action("ConfirmEmail", "Account",
                         new { userId = user.Id, token = token }, Request.Scheme);
 
                     //需要注入ILogger<AccountController> _logger;服务，记录生成的URL链接
@@ -115,7 +116,7 @@ namespace StudentMenagement.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            model.ExternalLogins =(await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (ModelState.IsValid)
             {
@@ -474,6 +475,50 @@ namespace StudentMenagement.Controllers
 
 
 
+
+        #endregion
+
+        #region 修改密码
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return RedirectToAction("Login");
+                }
+
+                // 使用ChangePasswordAsync()方法更改用户密码
+                var result = await _userManager.ChangePasswordAsync(user,
+                    model.CurrentPassword,model.NewPassword);
+
+                //如果新密码不符合复杂性规则或当前密码不正确，则需要将错误提示返回到
+                //ChangePassword视图中
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty,error.Description);
+                    }
+                    return View();
+                }
+
+                // 更改密码成功，会刷新登录Cookie
+                await _signInManager.RefreshSignInAsync(user);
+                return View("ChangePasswordConfirmation");
+            }
+
+            return View(model);
+        }
 
         #endregion
     }

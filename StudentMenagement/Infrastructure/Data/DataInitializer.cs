@@ -245,7 +245,7 @@ namespace StudentMenagement.Infrastructure.Data
                 { Email = "10924353902@qq.com", UserName = "1094353902@qq.com", EmailConfirmed = true, City = "合肥" };
                 userManager.CreateAsync(user, "1").Wait();// 等待异步方法执行完毕
                 dbcontext.SaveChanges();
-                var adminRole = "Admin";
+                var adminRole = "admin";
 
                 var role = new IdentityRole { Name = adminRole, };
 
