@@ -13,6 +13,7 @@ using NetCore.AutoRegisterDi;
 using StudentMenagement.Application;
 using StudentMenagement.Application.Courses;
 using StudentMenagement.Application.Students;
+using StudentMenagement.Application.Teachers;
 using StudentMenagement.CustomerMiddlewares;
 using StudentMenagement.DataRepositories;
 using StudentMenagement.Infrastructure;
@@ -51,10 +52,10 @@ namespace StudentMenagement
 
             var builder = services.AddControllersWithViews(config =>
              {
-                //添加全局身份验证
-                var policy = new AuthorizationPolicyBuilder()
-                                               .RequireAuthenticatedUser()
-                                               .Build();
+                 //添加全局身份验证
+                 var policy = new AuthorizationPolicyBuilder()
+                                                .RequireAuthenticatedUser()
+                                                .Build();
                  config.Filters.Add(new AuthorizeFilter(policy));
 
                  var policy1 = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -124,13 +125,15 @@ namespace StudentMenagement
 
             //依赖注入 单例 作用域 瞬间
             //services.AddSingleton<IStudentRepository, MockStudentRepository>();
-            services.AddScoped<IStudentRepository, SQLStudentRepository>();
+
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
             //services.AddScoped<ICourseRepository, SQLCourseRepository>();
-            services.AddTransient(typeof(IRepository<,>),typeof(RepositoryBase<,>));
+            services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             services.AddSingleton<DataProtectionPurposeStrings>();
+            services.AddScoped<IStudentRepository, SQLStudentRepository>();
             services.AddScoped<IStudentService, StudentService>();
-            services.AddScoped <ICourseService,CourseService>();
+            services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<ITeacherService, TeacherService>();
 
             //注入自定义授权处理程序
             //services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
@@ -221,3 +224,4 @@ namespace StudentMenagement
         }
     }
 }
+

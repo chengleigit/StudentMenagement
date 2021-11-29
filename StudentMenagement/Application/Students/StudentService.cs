@@ -24,8 +24,8 @@ namespace StudentMenagement.Application.Students
             //判断输入的查询名称是否为空
             if (!string.IsNullOrEmpty(input.FilterText))
             {
-                query = query.Where(s => s.Name.Contains(input.FilterText)
-                                         || s.Email.Contains(input.FilterText));
+                query = query.Where(s => s.Name.Contains(input.FilterText.Trim())
+                                         || s.Email.Contains(input.FilterText.Trim()));
             }
             //统计查询数据的总条数，用于分页计算总页数
             var count = query.Count();
