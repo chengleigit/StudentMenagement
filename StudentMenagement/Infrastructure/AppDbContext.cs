@@ -18,6 +18,7 @@ namespace StudentMenagement.Infrastructure
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<OfficeLocation> OfficeLocations { get; set; }
         public DbSet<CourseAssignment> CourseAssignments { get; set; }
+        public DbSet<Person> People { get; set; }
 
         /// <summary>
         /// 播种数据

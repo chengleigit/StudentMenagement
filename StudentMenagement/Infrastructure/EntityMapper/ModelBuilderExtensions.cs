@@ -43,7 +43,9 @@ namespace StudentMenagement.Infrastructure
             ///指定实体在数据库中生成的名称
             modelBuilder.Entity<Course>().ToTable("Course", "School");
             modelBuilder.Entity<StudentCourse>().ToTable("StudentCourse", "School");
-            modelBuilder.Entity<Student>().ToTable("Student", "School");
+            //modelBuilder.Entity<Student>().ToTable("Student", "School");
+            modelBuilder.Entity<Person>().ToTable("Person");
+
             modelBuilder.Entity<CourseAssignment>().HasKey(c => new { c.CourseID,c.TeacherID });
         }
 

@@ -11,11 +11,11 @@ namespace StudentMenagement.Models
     /// <summary>
     /// 学生类
     /// </summary>
-    public class Student
+    public class Student:Person
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
-        public string Name { get; set; }
+        //public string Name { get; set; }
 
         public MaEnum? MaJor { get; set; }
      

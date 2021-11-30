@@ -8,15 +8,15 @@ namespace StudentMenagement.Models
     /// <summary>
     /// 教师信息
     /// </summary>
-    public class Teacher
+    public class Teacher:Person
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
-        [Required]
-        [Display(Name = "姓名")]
-        [StringLength(50)]
-        [Column("TeacherName")]
-        public string Name { get; set; }
+        //[Required]
+        //[Display(Name = "姓名")]
+        //[StringLength(50)]
+        //[Column("TeacherName")]
+        //public string Name { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}",ApplyFormatInEditMode = true)]

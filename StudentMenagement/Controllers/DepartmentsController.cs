@@ -71,8 +71,15 @@ namespace StudentMenagement.Controllers
 
 
         public async Task<IActionResult> Details(int Id)
-        {   //因为需要实现预加载，所以不能直接使用FirstOrDefaultAsync()方法
-            var model = await _departmentRepository.GetAll().Include(a => a.Administrator).FirstOrDefaultAsync(a => a.DepartmentID == Id);
+        {
+
+            string query = "SELECT * FROM dbo.Departments WHERE DepartmentID={0}";
+            var model = await _dbcontext.Departments.FromSqlRaw(query,Id).Include(d => d.Administrator)
+                      .AsNoTracking()
+                      .FirstOrDefaultAsync();
+
+            ////因为需要实现预加载，所以不能直接使用FirstOrDefaultAsync()方法
+            //var model = await _departmentRepository.GetAll().Include(a => a.Administrator).FirstOrDefaultAsync(a => a.DepartmentID == Id);
             //判断学院信息是否存在
             if (model == null)
             {
