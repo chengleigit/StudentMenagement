@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using StudentMenagement.Infrastructure.EntityMapper;
 using StudentMenagement.Models;
 using System.Linq;
 
@@ -19,6 +22,10 @@ namespace StudentMenagement.Infrastructure
         public DbSet<OfficeLocation> OfficeLocations { get; set; }
         public DbSet<CourseAssignment> CourseAssignments { get; set; }
         public DbSet<Person> People { get; set; }
+        public DbSet<Blog> Blogs { get;set; }
+        public DbSet<BlogImage> BlogImages { get; set; }
+        public DbSet<Post> Posts { get; set; }
+
 
         /// <summary>
         /// 播种数据
@@ -38,9 +45,17 @@ namespace StudentMenagement.Infrastructure
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            
+            //启用配置
+            modelBuilder.ApplyConfiguration(new BlogMapper());
+            modelBuilder.ApplyConfiguration(new PostMapper());
+            modelBuilder.ApplyConfiguration(new StudentCourseMapper());
+        }
 
-           
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //optionsBuilder.UseLazyLoadingProxies()
+            //.UseSqlServer(_configuration.GetConnectionString("StudentDBConnection"));
+            
         }
     }
 }

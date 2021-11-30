@@ -47,6 +47,11 @@ namespace StudentMenagement.Infrastructure
             modelBuilder.Entity<Person>().ToTable("Person");
 
             modelBuilder.Entity<CourseAssignment>().HasKey(c => new { c.CourseID,c.TeacherID });
+
+
+            //modelBuilder.Entity<Blog>().ToTable("Blogs").HasKey(a => a.Id);
+            //modelBuilder.Entity<Blog>().Property(a => a.Title).HasMaxLength(50).HasColumnName("BlogTitle");
+
         }
 
         

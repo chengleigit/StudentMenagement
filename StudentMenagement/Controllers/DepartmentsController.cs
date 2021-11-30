@@ -219,5 +219,34 @@ namespace StudentMenagement.Controllers
             var dtos = new SelectList(models, "Id", "Name", selectedTeacher);
             return dtos;
         }
+
+
+        #region EF Core 中加载
+        
+        /// <summary>
+        /// 显示加载
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> LoadData(int id=1) 
+        {
+            
+            var department = _dbcontext.Departments
+                    .Single(b => b.DepartmentID == id);
+
+            //Collection()方法，实体与另外一个Collection集合之间的关联关系
+            _dbcontext.Entry(department)
+                    .Collection(b => b.Courses)
+                    .Load();
+
+            //  Reference()方法，可用于两个实体之间的关联
+            _dbcontext.Entry(department)
+                    .Reference(b => b.Administrator)
+                    .Load();
+
+            return "OK";
+        }
+
+
+        #endregion
     }
 }

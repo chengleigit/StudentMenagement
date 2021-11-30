@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentMenagement.Infrastructure;
 
 namespace StudentMenagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211130114843_AddBlogs")]
+    partial class AddBlogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -413,7 +415,7 @@ namespace StudentMenagement.Migrations
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("Enrollment");
+                    b.ToTable("StudentCourse", "School");
                 });
 
             modelBuilder.Entity("StudentMenagement.Models.Student", b =>

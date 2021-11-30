@@ -46,6 +46,7 @@ namespace StudentMenagement
             //◊¢»ÎHttpContextAccessor
             //services.AddHttpContextAccessor();
 
+            //∆Ù”√—”≥Ÿº”‘ÿUseLazyLoadingProxies()
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(_configuration.GetConnectionString("StudentDBConnection"))
                 );
