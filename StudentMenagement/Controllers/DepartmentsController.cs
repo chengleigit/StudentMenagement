@@ -165,30 +165,30 @@ namespace StudentMenagement.Controllers
                     }
                     catch (DbUpdateConcurrencyException e)
                     {   //触发异常后，获取异常的实体
-                         exceptionEntry = e.Entries.Single();
-                         clientValues = (Department)exceptionEntry.Entity;
+                        exceptionEntry = e.Entries.Single();
+                        clientValues = (Department)exceptionEntry.Entity;
                         //从数据库中获取该异常实体信息
                         var databaseEntry = exceptionEntry.GetDatabaseValues();
                         if (databaseEntry == null)
                         {//如果异常实体为null，则表示该行数据已经被删除
-                            ModelState.AddModelError(string.Empty,"无法进行数据的修改。该部门信息已经被其他人所删除!");
+                            ModelState.AddModelError(string.Empty, "无法进行数据的修改。该部门信息已经被其他人所删除!");
                         }
                         else
                         {     //将异常实体中的错误信息精确到具体字段并传递到视图中
                             var databaseValues = (Department)databaseEntry.ToObject();
                             if (databaseValues.Name != clientValues.Name)
-                                ModelState.AddModelError("Name",$"当前值:{databaseValues.Name}");
+                                ModelState.AddModelError("Name", $"当前值:{databaseValues.Name}");
                             if (databaseValues.Budget != clientValues.Budget)
-                                ModelState.AddModelError("Budget",$"当前值:{databaseValues.Budget}");
+                                ModelState.AddModelError("Budget", $"当前值:{databaseValues.Budget}");
                             if (databaseValues.StartDate != clientValues.StartDate)
-                                ModelState.AddModelError("StartDate",$"当前值:{databaseValues.StartDate}");
+                                ModelState.AddModelError("StartDate", $"当前值:{databaseValues.StartDate}");
                             if (databaseValues.TeacherID != clientValues.TeacherID)
                             {
                                 var teacherEntity =
                                      await _teacherRepository.FirstOrDefaultAsync(a => a.Id == databaseValues.TeacherID);
-                                ModelState.AddModelError("TeacherId",$"当前值:{teacherEntity?.Name}");
+                                ModelState.AddModelError("TeacherId", $"当前值:{teacherEntity?.Name}");
                             }
-                            ModelState.AddModelError("","您正在编辑的记录已经被其他用户所修改，编辑操作已经被取消，数据库当前的值已经显示在页面上。请再次单击保存。否则请返回列表。");
+                            ModelState.AddModelError("", "您正在编辑的记录已经被其他用户所修改，编辑操作已经被取消，数据库当前的值已经显示在页面上。请再次单击保存。否则请返回列表。");
                             input.RowVersion = databaseValues.RowVersion;
                             //记得初始化教师列表
                             input.TeacherList = TeachersDropDownList();
@@ -196,8 +196,9 @@ namespace StudentMenagement.Controllers
                         }
                     }
                 }
-                return View(input);
             }
+                return View(input);
+            
         }
 
 
