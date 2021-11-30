@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudentMenagement.Application.Courses;
 using StudentMenagement.Application.Dtos;
+using StudentMenagement.Infrastructure;
 using StudentMenagement.Infrastructure.Repositories;
 using StudentMenagement.Models;
 using StudentMenagement.ViewModels.Courses;
@@ -17,16 +18,19 @@ namespace StudentMenagement.Controllers
         private readonly IRepository<Course, int> _courseRepository;
         private readonly IRepository<Department, int> _departmentRepository;
         private readonly IRepository<CourseAssignment, int> _courseAssignmentsRepository;
+        private readonly AppDbContext _dbcontext;
 
         public CourseController(ICourseService courseService,
             IRepository<Course, int> courseRepository,
             IRepository<Department, int> departmentRepository,
-            IRepository<CourseAssignment, int> courseAssignmentsRepository)
+            IRepository<CourseAssignment, int> courseAssignmentsRepository,
+            AppDbContext dbcontext)
         {
             _courseService = courseService;
             _courseRepository = courseRepository;
             _departmentRepository = departmentRepository;
             _courseAssignmentsRepository = courseAssignmentsRepository;
+            _dbcontext = dbcontext;
         }
 
         // 不填写 [HttpGet]默认为处理GET请求
@@ -144,6 +148,26 @@ namespace StudentMenagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        #endregion
+
+        #region 修改课程学分
+        public IActionResult UpdateCourseCredits()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateCourseCredits(int? multiplier)
+        {
+            if (multiplier != null)
+            {
+                ViewBag.RowsAffected =
+                    //通过ExecuteSqlRawAsync()方法执行SQL语句
+                    await _dbcontext.Database.ExecuteSqlRawAsync(
+                        "UPDATE School.Course SET Credits = Credits * {0}",
+                        parameters: multiplier);
+            }
+            return View();
+        }
         #endregion
 
         public async Task<ViewResult> Details(int courseId)

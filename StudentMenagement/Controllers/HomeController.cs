@@ -18,6 +18,8 @@ using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using StudentMenagement.Application.Dtos;
 using StudentMenagement.Application.Students;
+using StudentMenagement.Infrastructure;
+using System.Data.Common;
 
 namespace StudentMenagement.Controllers
 {
@@ -27,6 +29,7 @@ namespace StudentMenagement.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<HomeController> _logger;
         private readonly IStudentService _studentService;
+        private readonly AppDbContext _dbcontext;
 
         //IDataProtector提供了Protect() 和 Unprotect() 方法,可以对数据进行加密或者解密。
         private readonly IDataProtector _protector;
@@ -36,7 +39,8 @@ namespace StudentMenagement.Controllers
             ILogger<HomeController> logger,
             IDataProtectionProvider dataProtectionProvider,
             DataProtectionPurposeStrings dataProtectionPurposeStrings,
-            IStudentService studentService
+            IStudentService studentService,
+            AppDbContext dbcontext
             )
         {
             _studentRepository = studentRepository;
@@ -45,6 +49,7 @@ namespace StudentMenagement.Controllers
             _protector = dataProtectionProvider.CreateProtector(
                  dataProtectionPurposeStrings.StudentIdRouteValue);
             _studentService = studentService;
+            _dbcontext= dbcontext;
         }
 
         public async Task<IActionResult> Index(GetStudentInput input)
@@ -393,17 +398,60 @@ namespace StudentMenagement.Controllers
         [HttpGet]
         public async Task<ActionResult> About()
         {
-            //获取IQueryable类型的Student，然后通过student.EnrollmentDate进行分组
-            var data = from student in _studentRepository.GetAll()
-                       group student by student.EnrollmentDate into dateGroup
+            #region LINQ
+            ////获取IQueryable类型的Student，然后通过student.EnrollmentDate进行分组
+            //var data = from student in _studentRepository.GetAll()
+            //           group student by student.EnrollmentDate into dateGroup
 
-                       select new EnrollmentDateGroupDto()
-                       {
-                           EnrollmentDate = dateGroup.Key,
-                           StudentCount = dateGroup.Count()
-                       };
-            var dtos = await data.AsNoTracking().ToListAsync();
-            return View(dtos);
+            //           select new EnrollmentDateGroupDto()
+            //           {
+            //               EnrollmentDate = dateGroup.Key,
+            //               StudentCount = dateGroup.Count()
+            //           };
+            //var dtos = await data.AsNoTracking().ToListAsync();
+
+            #endregion
+
+            List<EnrollmentDateGroupDto> groups = new List<EnrollmentDateGroupDto>();
+            //获取数据库的上下文连接
+            var conn = _dbcontext.Database.GetDbConnection();
+
+            try
+            {
+                //打开数据库连接
+                await conn.OpenAsync();
+                //建立连接，因为非委托资源，所以需要使用using进行内存资源的释放
+                using (var command = conn.CreateCommand())
+                {
+                    string query = @$"SELECT EnrollmentDate,COUNT(1) AS StudentCount   
+                                       FROM Person  WHERE Discriminator = 'Student'  GROUP BY EnrollmentDate";
+                    command.CommandText = query;//赋值需要执行的SQL语句
+                    DbDataReader reader = await command.ExecuteReaderAsync();
+                    //执行命令
+                    if (reader.HasRows)//判断是否有返回行
+                    {       //读取行数据，将返回值填充到视图模型中
+                        while (await reader.ReadAsync())
+                        {
+                            var row = new EnrollmentDateGroupDto
+                            {
+                                EnrollmentDate = reader.GetDateTime(0),
+                                StudentCount = reader.GetInt32(1)
+                            };
+                            groups.Add(row);
+                        }
+                    }
+                    //释放使用的所有资源
+                    reader.Dispose();
+                }
+
+            }
+            finally 
+            {
+                //关闭数据库连接
+                conn.Close();
+            }
+
+            return View(groups);
         }
 
         //public string Details(int? Id,string name)
