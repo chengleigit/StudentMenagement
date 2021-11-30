@@ -25,6 +25,7 @@ namespace StudentMenagement.Infrastructure
         public DbSet<Blog> Blogs { get;set; }
         public DbSet<BlogImage> BlogImages { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<TodoItem> TodoItems { get; set; }
 
 
         /// <summary>
