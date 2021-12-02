@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentMenagement.Infrastructure.Repositories;
 using StudentMenagement.Models;
@@ -9,8 +10,9 @@ namespace StudentMenagement.Controllers
 {
     [AllowAnonymous]
     [ApiController]
-    [Route("[Controller]")]
+    //[Route("[Controller]")]
     //[Route("todo")]
+    [Route("api/[controller]/[action]")]
     public class TodoController : ControllerBase
     {
         //注入仓储服务，TodoItem的主键Id为long类型，仓储服务参数也需要对应一致
@@ -21,6 +23,10 @@ namespace StudentMenagement.Controllers
             this._todoItemRepository = todoRepository;
         }
 
+        /// <summary>
+        /// 获取所有待办事项
+        /// </summary>
+        /// <returns> </returns>
         // GET:api/Todo
         [HttpGet]
         public async Task<ActionResult<List<TodoItem>>> GetTodo()
@@ -32,6 +38,11 @@ namespace StudentMenagement.Controllers
 
         #region 根据Id获取待办事项
 
+        /// <summary>
+        /// 通过Id获取待办事项
+        /// </summary>
+        /// <param name="id"> </param>
+        /// <returns> </returns>
         // GET:api/Todo/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
@@ -50,6 +61,12 @@ namespace StudentMenagement.Controllers
 
         #region 更新待办事项
 
+        /// <summary>
+        /// 更新待办事项
+        /// </summary>
+        /// <param name="id"> </param>
+        /// <param name="todoItem"> </param>
+        /// <returns> </returns>
         // PUT:api/Todo/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
@@ -69,8 +86,20 @@ namespace StudentMenagement.Controllers
 
         #region 添加待办事项
 
+        ///// <summary>
+        ///// 添加待办事项
+        ///// </summary>
+        ///// <param name="todoItem"> </param>
+        ///// <returns> </returns>
+        /// <summary>
+        /// 添加待办事项
+        /// </summary>
+        /// <param name="todoItem"></param>
+        /// <returns></returns>
         // POST:api/Todo
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
         {
             await _todoItemRepository.InsertAsync(todoItem);
@@ -83,6 +112,11 @@ namespace StudentMenagement.Controllers
 
         #region 删除指定Id的待办事项
 
+        /// <summary>
+        /// 删除指定Id的待办事项
+        /// </summary>
+        /// <param name="id"> </param>
+        /// <returns> </returns>
         // DELETE:api/Todo/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<TodoItem>> DeleteTodoItem(long id)

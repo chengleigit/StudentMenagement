@@ -19,6 +19,7 @@ namespace StudentMenagement.Controllers
         }
         
         [Route("Error/{statusCode}")]
+        [HttpGet]
         public IActionResult HttpStatusCodeHandler(int statusCode) 
         {
             var statusCodeResult = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
@@ -40,6 +41,7 @@ namespace StudentMenagement.Controllers
 
         [AllowAnonymous]
         [Route("Error")]
+        [HttpGet]
         public IActionResult Error() 
         {
             var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();

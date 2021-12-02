@@ -9,10 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using NetCore.AutoRegisterDi;
 using StudentMenagement.Application;
 using StudentMenagement.Application.Courses;
 using StudentMenagement.Application.Departments;
+using StudentMenagement.Application.Dtos;
 using StudentMenagement.Application.Students;
 using StudentMenagement.Application.Teachers;
 using StudentMenagement.CustomerMiddlewares;
@@ -25,7 +27,9 @@ using StudentMenagement.Security;
 using StudentMenagement.Security.CustomTokenProvider;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace StudentMenagement
@@ -89,7 +93,7 @@ namespace StudentMenagement
                 options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
 
                 //登录失败5次将锁定15分钟
-                options.Lockout.MaxFailedAccessAttempts = 5; 
+                options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             });
 
@@ -97,7 +101,7 @@ namespace StudentMenagement
               .AddErrorDescriber<CustomIdentityErrorDescriber>() //覆盖掉英文的错误提示
               .AddEntityFrameworkStores<AppDbContext>()
                     .AddDefaultTokenProviders();
-                    //.AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>("CustomEmailConfirmation");
+            //.AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>("CustomEmailConfirmation");
 
 
 
@@ -176,11 +180,24 @@ namespace StudentMenagement
             //    .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
             //.AsPublicImplementedInterfaces();
 
+  //          var assembliesToScan = new[]   {
+  //Assembly.GetExecutingAssembly(),
+  //Assembly.GetAssembly(typeof(PagedResultDto<>)),//因为PagedResultDto<>在
+  ////MockSchoolManagement.Application类库中，所以通过PagedResultDto<>获取程序集信息
+  //          };
+
+  //          //自动注入服务到依赖注入容器
+  //          services.RegisterAssemblyPublicNonGenericClasses(assembliesToScan)//将获
+  //                                                                            //取到的程序集信息注册到我们的依赖注入容器中
+  //          .Where(c => c.Name.EndsWith("Service"))
+  //          .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+
             //依赖注入 单例 作用域 瞬间
             //services.AddSingleton<IStudentRepository, MockStudentRepository>();
 
             //services.AddTransient<IStudentRepository, MockStudentRepository>();
             //services.AddScoped<ICourseRepository, SQLCourseRepository>();
+
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             services.AddSingleton<DataProtectionPurposeStrings>();
             services.AddScoped<IStudentRepository, SQLStudentRepository>();
@@ -193,6 +210,37 @@ namespace StudentMenagement
 
 
 
+            // 注册Swagger生成器，定义一个或多个Swagger文件
+            services.AddSwaggerGen(c =>
+            {
+                //c.SwaggerDoc("v1",new OpenApiInfo { Title = "StudentManagement API",Version = "v1" });
+
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "StudentManagement API",
+                    Description = "StudentManagement，添加一个简单的ASP.NET Core Web API示例，由52ABP出品。",
+                    Version = "v1",
+                    TermsOfService = new Uri("https://sc.52abp.com"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "梁桐铭",
+                        Email = "ltm@ddxc.org",
+                        Url = new Uri("https://github.com/ltm0203/")
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Apache License 2.0",
+                        Url = new Uri("https://github.com/yoyomooc/asp.net-core--for-beginner/blob/master/LICENSE"),
+                    }
+                });
+                if (_env.IsDevelopment())
+                {
+                    // 设置Swagger JSON和UI的注释路径
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    c.IncludeXmlComments(xmlPath);
+                }
+            });
 
 
 
@@ -232,6 +280,17 @@ namespace StudentMenagement
 
             //添加静态文件中间件
             app.UseStaticFiles();
+
+
+            // 启用中间件Swagger()
+            app.UseSwagger();
+            //启用中间件Swagger()的UI服务，它需要与Swagger()配置在一起
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "StudentManagement API V1");
+            });
+
+
 
             //添加身份验证中间件
             app.UseAuthentication();

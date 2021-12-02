@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StudentMenagement.Core\StudentMenagement.Core.csproj" />
+    <ProjectReference Include="..\StudentMenagement.EntityFrameworkCore\StudentMenagement.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
+	</ItemGroup>
+	
+
+
+
+</Project>
